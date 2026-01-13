@@ -1,4 +1,8 @@
+// eslint-disable-next-line no-undef
 module.exports = {
+  languageOptions: {
+    sourceType: 'commonjs',
+  },
   env: {
     browser: true,
     es6: true,
@@ -15,7 +19,6 @@ module.exports = {
   plugins: ['react', 'jest'],
   rules: {
     indent: ['error', 2],
-    'linebreak-style': ['error', 'unix'],
     quotes: ['error', 'single'],
     semi: ['error', 'never'],
     eqeqeq: 'error',
@@ -25,4 +28,4 @@ module.exports = {
     'no-console': 'error',
     'react/prop-types': 0,
   },
-};
+}

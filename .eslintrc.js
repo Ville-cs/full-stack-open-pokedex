@@ -1,10 +1,7 @@
-// eslint-disable-next-line no-undef
 module.exports = {
-  languageOptions: {
-    sourceType: 'commonjs',
-  },
   env: {
     browser: true,
+    node: true,
     es6: true,
     'jest/globals': true,
   },

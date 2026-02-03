@@ -21,3 +21,15 @@ jobs:
       - run: npm run eslint
       - run: npm run test
       - run: npm run build
+  tag_release:
+    if: ${{ github.event_name == 'push' }}
+    needs: [simple_deployment_pipeline]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Github Tag Bump
+        uses: anothrNick/github-tag-action@1.75.0
+        with:
+          dry-run: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch

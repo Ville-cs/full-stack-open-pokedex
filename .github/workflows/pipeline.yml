@@ -28,8 +28,7 @@ jobs:
     steps:
       - name: Github Tag Bump
         uses: anothrNick/github-tag-action@1.75.0
-        with:
-          dry-run: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
+          DRY_RUN: true

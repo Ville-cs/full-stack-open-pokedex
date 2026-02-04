@@ -1,9 +1,9 @@
 name: Deployment pipeline
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   pull_request:
     branches: [main]
     types: [opened, synchronize]
@@ -27,8 +27,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Github Tag Bump
+        with:
+          fetch-depth: '0'
         uses: anothrNick/github-tag-action@1.75.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_PREFIX: v
           DEFAULT_BUMP: patch
           DRY_RUN: true

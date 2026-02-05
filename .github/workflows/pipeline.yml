@@ -9,6 +9,7 @@ on:
     types: [opened, synchronize]
 jobs:
   simple_deployment_pipeline:
+    needs: [env_variables]
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
@@ -20,10 +21,12 @@ jobs:
         run: npm install
       - run: npm run eslint
       - run: npm run test
-      - run: npm run build
+      - name: build
+        if: ${{ contains(needs.env_variables.outputs.commit_message, '#skip') == 'false' }}
+        run: npm run build
   tag_release:
-    if: ${{ github.event_name == 'push' }}
-    needs: [simple_deployment_pipeline]
+    needs: [simple_deployment_pipeline, env_variables]
+    if: ${{ github.event_name == 'push' && contains(needs.env_variables.outputs.commit_message, '#skip') == 'false'}}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +37,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: v
           DEFAULT_BUMP: patch
-  a_test_job:
+  env_variables:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,3 +53,5 @@ jobs:
         env:
           COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
         run: echo "$COMMIT_MESSAGES"
+    outputs:
+      commit_message: ${{ join('COMMIT_MESSAGES') }}

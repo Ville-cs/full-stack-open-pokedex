@@ -56,11 +56,11 @@ jobs:
     outputs:
       commit_message: ${{ join('COMMIT_MESSAGES') }}
   success_notification:
-    needs: [tag_release]
+    needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
     steps:
       - name: Success notification
-        if: needs.tag_release.result == 'success'
+        if: needs.simple_deployment_pipeline.result == 'success'
         uses: rjstone/discord-webhook-notify@v2.2.1
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
@@ -68,7 +68,7 @@ jobs:
           severity: info
           details: All tests passed and a new version has been deployed to production!
       - name: failure notification
-        if: needs.tag_release.result == 'failure'
+        if: needs.simple_deployment_pipeline.result == 'failure'
         uses: rjstone/discord-webhook-notify@v2.2.1
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

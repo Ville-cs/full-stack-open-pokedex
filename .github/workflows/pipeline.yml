@@ -55,3 +55,13 @@ jobs:
         run: echo "$COMMIT_MESSAGES"
     outputs:
       commit_message: ${{ join('COMMIT_MESSAGES') }}
+  success_notification:
+    name: success notification
+    needs: [tag_release]
+    uses: rjstone/discord-webhook-notify@v2
+    if: success()
+    with:
+      webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      username: Cool user
+      severity: info
+      details: All tests passed and a new version has been deployed to production!

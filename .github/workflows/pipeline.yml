@@ -55,3 +55,23 @@ jobs:
         run: echo "$COMMIT_MESSAGES"
     outputs:
       commit_message: ${{ join('COMMIT_MESSAGES') }}
+  success_notification:
+    needs: [tag_release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Success notification
+        if: needs.tag_release.result == 'success'
+        uses: rjstone/discord-webhook-notify@v2.2.1
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          username: Cool user
+          severity: info
+          details: All tests passed and a new version has been deployed to production!
+      - name: failure notification
+        if: needs.tag_release.result == 'failure'
+        uses: rjstone/discord-webhook-notify@v2.2.1
+        with:
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          username: Cool user
+          severity: error
+          details: There has been an error in the build!

@@ -52,14 +52,16 @@ jobs:
       - name: commit messages
         env:
           COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+          COMMIT_MESSAGES_STR: ${{ join('COMMIT_MESSAGES') }}
         run: echo "$COMMIT_MESSAGES"
+          echo "$COMMIT_MESSAGES_STR"
     outputs:
       commit_message: ${{ join('COMMIT_MESSAGES') }}
-  success_notification:
+  notifications:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
     steps:
-      - name: Success notification
+      - name: success notification
         if: needs.simple_deployment_pipeline.result == 'success'
         uses: rjstone/discord-webhook-notify@v2.2.1
         with:

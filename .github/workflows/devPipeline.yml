@@ -1,7 +1,7 @@
 name: Deployment pipeline
 
 env:
-  SKIP: #skip
+  SKIP: '#skip'
 
 on:
   push:
@@ -36,6 +36,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: test output
         run: echo ${{ contains(needs.env_variables.outputs.joined_message, env.SKIP) }}
+      - name: test output 2
+        run: echo ${{ needs.env_variables.outputs.joined_message }}
 
   skip_test:
     if: ${{ contains(join(needs.env_variables.outputs.commit_message), '#skip') }}

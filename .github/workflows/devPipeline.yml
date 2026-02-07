@@ -23,9 +23,10 @@ jobs:
       - name: commit messages
         env:
           COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-          JOINED_MESSAGE: ${{ join(env.COMMIT_MESSAGES) }}
+          HASSKIP: ${{ contains(join(env.COMMIT_MESSAGES, ', '), env.SKIP) }}
         run: echo "$COMMIT_MESSAGES"
     outputs:
+      skip_present: HASSKIP
       commit_message: COMMIT_MESSAGES
       joined_message: JOINED_MESSAGE
 
@@ -39,12 +40,12 @@ jobs:
       - name: test output 2
         env:
           message: ${{ needs.env_variables.outputs.joined_message }}
-        run: echo ${{ contains(env.message, env.SKIP) }}
+        run: echo ${{ needs.env_variables.outputs.skip_present }}
 
   skip_test:
-    if: ${{ contains(join(needs.env_variables.outputs.commit_message), '#skip') }}
+    if: ${{ needs.env_variables.outputs.skip_present }}
     needs: [env_variables]
     runs-on: ubuntu-latest
     steps:
       - name: skip test
-        run: echo not skipped
+        run: echo skip present

@@ -7,15 +7,15 @@ on:
   push:
     branches:
       - dev
+
 jobs:
   env_variables:
     runs-on: ubuntu-latest
     outputs:
-      # skip_present: HASSKIP
       commit_message: ${{ steps.commit_messages.outputs.commit_message }}
     steps:
       - uses: actions/checkout@v4
-        # HASSKIP: ${{ contains(join(env.COMMIT_MESSAGES, ', '), env.SKIP) }}
+
       - name: commit messages
         id: commit_messages
         run: |
@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: test output 1
         run: |
           echo '${{ needs.env_variables.outputs.commit_message }}'

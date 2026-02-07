@@ -31,7 +31,7 @@ jobs:
         run: echo ${COMMIT_MESSAGES}
     outputs:
       skip_present: HASSKIP
-      commit_message: COMMIT_MESSAGES
+      commit_message: ${COMMIT_MESSAGES}
       joined_message: JOINED_MESSAGE
 
   dev_workflow:
@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: test output 1
-        run: echo ${{ contains(needs.env_variables.outputs.joined_message, env.SKIP) }}
+        run: echo ${{ needs.env_variables.outputs.commit_message }}
       - name: test output 2
         env:
           message: ${{ needs.env_variables.outputs.joined_message }}

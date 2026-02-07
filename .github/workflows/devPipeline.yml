@@ -27,10 +27,7 @@ jobs:
 
   dev_workflow:
     needs: [env_variables]
+    if: ${{ needs.env_variables.outputs.skip_present == 'false' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: test output 1
-        run: |
-          echo '${{ needs.env_variables.outputs.commit_message }}'
+      - run: echo "Running dev workflow"

@@ -26,6 +26,8 @@ jobs:
           HASSKIP: ${{ contains(join(env.COMMIT_MESSAGES, ', '), env.SKIP) }}
         run: echo "$COMMIT_MESSAGES"
       - name: echo test
+        env:
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
         run: echo ${COMMIT_MESSAGES}
     outputs:
       skip_present: HASSKIP

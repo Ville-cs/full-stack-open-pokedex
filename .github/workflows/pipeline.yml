@@ -11,7 +11,7 @@ jobs:
   env_variables:
     runs-on: ubuntu-latest
     outputs:
-      commit_message: ${{ steps.commit_messages.outputs.commit_message }}
+      skip_present: ${{ steps.detect_skip.outputs.skip_present }}
     steps:
       - uses: actions/checkout@v4
       - name: github context
@@ -22,14 +22,16 @@ jobs:
         env:
           COMMITS: ${{ toJson(github.event.commits) }}
         run: echo "$COMMITS"
-      - name: commit messages
-        id: commit_messages
+      - name: detect skip token
+        id: detect_skip
         run: |
-          {
-            echo 'commit_message<<EOF'
-            echo '${{ toJson(github.event.commits.*.message) }}'
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+          messages='${{ toJson(github.event.commits.*.message) }}'
+
+          if echo "$messages" | grep -qi '#skip'; then
+            echo "skip_present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip_present=false" >> "$GITHUB_OUTPUT"
+          fi
 
   simple_deployment_pipeline:
     needs: [env_variables]
@@ -40,31 +42,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: test outputs
-        env:
-          STR: ${{ needs.env_variables.outputs.commit_message }}
-        run: echo '$STR'
-      - name: test outputs 2
-        env:
-          str: ${{ needs.env_variables.outputs.commit_message }}
-          str2: ${{ join(env.str) }}
-        run: echo '$str2'
-      - name: test outputs 3
-        env:
-          str: ${{ needs.env_variables.outputs.commit_message }}
-          str2: ${{ join(env.str) }}
-          str3: ${{ contains(env.str2, '#skip') }}
-        run: echo "$str3"
       - name: Install dependencies
         run: npm install
       - run: npm run eslint
       - run: npm run test
       - name: build
-        if: ${{ contains(needs.env_variables.outputs.commit_message, '#skip') == 'false' }}
+        if: ${{ needs.env_variables.outputs.skip_present == 'false' }}
         run: npm run build
+
   tag_release:
-    needs: [simple_deployment_pipeline, env_variables]
-    if: ${{ github.event_name == 'push' && contains(needs.env_variables.outputs.commit_message, '#skip') == 'false'}}
+    needs: [env_variables]
+    if: ${{ github.event_name == 'push' && needs.env_variables.outputs.skip_present == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -75,7 +63,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: v
           DEFAULT_BUMP: patch
+
   notifications:
+    # sends notifications to my private Discord server
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
     steps:
@@ -84,6 +74,8 @@ jobs:
         uses: rjstone/discord-webhook-notify@v2.2.1
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+          text: this is above the embed
+          title: title of the post
           username: Cool user
           severity: info
           details: All tests passed and a new version has been deployed to production!

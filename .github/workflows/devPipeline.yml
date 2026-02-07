@@ -10,6 +10,9 @@ on:
 jobs:
   env_variables:
     runs-on: ubuntu-latest
+    outputs:
+      # skip_present: HASSKIP
+      commit_message: ${{ steps.commit_messages.outputs.commit_message }}
     steps:
       - uses: actions/checkout@v4
         # HASSKIP: ${{ contains(join(env.COMMIT_MESSAGES, ', '), env.SKIP) }}
@@ -17,9 +20,6 @@ jobs:
         id: commit_messages
         run: |
           echo "commit_message=${{ toJson(github.event.commits.*.message) }}" >> "$GITHUB_OUTPUT"
-    outputs:
-      # skip_present: HASSKIP
-      commit_message: ${{ steps.commit_messages.outputs.commit_message }}
 
   dev_workflow:
     needs: [env_variables]

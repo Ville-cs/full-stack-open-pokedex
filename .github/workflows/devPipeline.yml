@@ -40,7 +40,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: test output 1
-        run: echo ${{ needs.env_variables.outputs.commit_message }}
+        run: echo ${ needs.env_variables.outputs.commit_message }
       - name: test output 2
         env:
           message: ${{ needs.env_variables.outputs.joined_message }}

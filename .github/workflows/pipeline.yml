@@ -8,6 +8,27 @@ on:
     branches: [main]
     types: [opened, synchronize]
 jobs:
+  env_variables:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: github context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: commits
+        env:
+          COMMITS: ${{ toJson(github.event.commits) }}
+        run: echo "$COMMITS"
+      - name: commit messages
+        env:
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+          JOIN: ${{ join(env.COMMIT_MESSAGES) }}
+          SKIP: '#skip'
+          CONTAINS: ${{ contains(env.JOIN, env.SKIP) }}
+        run: echo "$COMMIT_MESSAGES $JOIN $CONTAINS"
+    outputs:
+      commit_message: COMMIT_MESSAGES
   simple_deployment_pipeline:
     needs: [env_variables]
     if: ${{ github.event_name == 'push' }}
@@ -52,24 +73,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_PREFIX: v
           DEFAULT_BUMP: patch
-  env_variables:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: github context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: commits
-        env:
-          COMMITS: ${{ toJson(github.event.commits) }}
-        run: echo "$COMMITS"
-      - name: commit messages
-        env:
-          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-        run: echo "$COMMIT_MESSAGES"
-    outputs:
-      commit_message: COMMIT_MESSAGES
   notifications:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest

@@ -1,5 +1,8 @@
 name: Deployment pipeline
 
+env:
+  SKIP: #skip
+
 on:
   push:
     branches:
@@ -20,9 +23,11 @@ jobs:
       - name: commit messages
         env:
           COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+          JOINED_MESSAGE: ${{ join(env.COMMIT_MESSAGES) }}
         run: echo "$COMMIT_MESSAGES"
     outputs:
       commit_message: COMMIT_MESSAGES
+      joined_message: JOINED_MESSAGE
 
   dev_deployment_pipeline:
     needs: [env_variables]
@@ -30,11 +35,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: test output
-        env:
-          SKIP: #skip
-        run: echo ${{ contains(join(needs.env_variables.outputs.commit_message), env.SKIP) }}
+        run: echo ${{ contains(needs.env_variables.outputs.joined_message, env.SKIP) }}
+
   skip_test:
-    if: ${{ contains(join(needs.env_variables.outputs.commit_message), '#skip') != "false" }}
+    if: ${{ contains(join(needs.env_variables.outputs.commit_message), '#skip') }}
     needs: [env_variables]
     runs-on: ubuntu-latest
     steps:

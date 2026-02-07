@@ -20,19 +20,14 @@ jobs:
         env:
           COMMITS: ${{ toJson(github.event.commits) }}
         run: echo "$COMMITS"
+        # HASSKIP: ${{ contains(join(env.COMMIT_MESSAGES, ', '), env.SKIP) }}
       - name: commit messages
-        env:
-          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-          HASSKIP: ${{ contains(join(env.COMMIT_MESSAGES, ', '), env.SKIP) }}
-        run: echo "$COMMIT_MESSAGES"
-      - name: echo test
-        env:
-          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
-        run: echo ${COMMIT_MESSAGES}
+        id: commit_messages
+        run: |
+          echo "commit_message=${{ toJson(github.event.commits.*.message) }}" >> "$GITHUB_OUTPUT"
     outputs:
-      skip_present: HASSKIP
-      commit_message: ${COMMIT_MESSAGES}
-      joined_message: JOINED_MESSAGE
+      # skip_present: HASSKIP
+      commit_message: ${{ steps.commit_messages.outputs.commit_message }}
 
   dev_workflow:
     needs: [env_variables]
@@ -40,11 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: test output 1
-        run: echo ${ needs.env_variables.outputs.commit_message }
-      - name: test output 2
-        env:
-          message: ${{ needs.env_variables.outputs.joined_message }}
-        run: echo ${{ needs.env_variables.outputs.skip_present }}
+        run: echo ${{ needs.env_variables.outputs.commit_message }}
 
   skip_test:
     if: ${{ needs.env_variables.outputs.skip_present }}

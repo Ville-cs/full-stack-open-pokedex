@@ -20,18 +20,18 @@ jobs:
       - name: test outputs
         env:
           str: ${{ needs.env_variables.outputs.commit_message }}
-        run: echo $'str'
+        run: echo '$str'
       - name: test outputs 2
         env:
           str: ${{ needs.env_variables.outputs.commit_message }}
           str2: ${{ join('str') }}
-        run: echo $'str2'
+        run: echo '$str2'
       - name: test outputs 3
         env:
           str: ${{ needs.env_variables.outputs.commit_message }}
           str2: ${{ join('str') }}
           str3: ${{ contains('str2', '#skip') }}
-        run: echo $"str3"
+        run: echo "$str3"
       - name: Install dependencies
         run: npm install
       - run: npm run eslint

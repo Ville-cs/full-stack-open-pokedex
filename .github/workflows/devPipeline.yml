@@ -34,7 +34,7 @@ jobs:
           SKIP: #skip
         run: echo ${{ contains(join(needs.env_variables.outputs.commit_message), env.SKIP) }}
   skip_test:
-    if: ${{ !contains(join(needs.env_variables.outputs.commit_message), '#skip') }}
+    if: ${{ contains(join(needs.env_variables.outputs.commit_message), '#skip') }}
     needs: [env_variables]
     runs-on: ubuntu-latest
     steps:

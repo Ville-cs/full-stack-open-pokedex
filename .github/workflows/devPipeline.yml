@@ -1,0 +1,53 @@
+name: Deployment pipeline
+
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  env_variables:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: github context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: commits
+        env:
+          COMMITS: ${{ toJson(github.event.commits) }}
+        run: echo "$COMMITS"
+      - name: commit messages
+        env:
+          COMMIT_MESSAGES: ${{ toJson(github.event.commits.*.message) }}
+          JOIN: ${{ join(env.COMMIT_MESSAGES) }}
+          SKIP: '#skip'
+          CONTAINS: ${{ contains(env.JOIN, env.SKIP) }}
+        run: echo "$COMMIT_MESSAGES $JOIN $CONTAINS"
+    outputs:
+      commit_message: COMMIT_MESSAGES
+
+  dev_deployment_pipeline:
+    needs: [env_variables]
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: test outputs
+        env:
+          STR: ${{ needs.env_variables.outputs.commit_message }}
+        run: echo '$STR'
+      - name: test outputs 2
+        env:
+          str: ${{ needs.env_variables.outputs.commit_message }}
+          str2: ${{ join(env.str) }}
+        run: echo '$str2'
+      - name: test outputs 3
+        env:
+          str: ${{ needs.env_variables.outputs.commit_message }}
+          str2: ${{ join(env.str) }}
+          str3: ${{ contains(env.str2, '#skip') }}
+        run: echo "$str3"

@@ -75,13 +75,15 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           status: Success
+          avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
           title: Deployment successful
-          description: Deployment successful for `${{ github.repository }}`. `SHA(${{ github.sha }})`
+          description: Deployment successful for `${{ github.repository }}` | `SHA ${{ github.sha }}`
       - name: failure notification
         uses: sarisia/actions-status-discord@v1
         if: failure() && needs.simple_deployment_pipeline.result == 'failure'
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          avatar_url: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
           status: Failure
           title: Deployment failed
-          description: Deployment failed for `${{ github.repository }}`. `(${{ github.sha }})`
+          description: Deployment failed for `${{ github.repository }}` | `SHA ${{ github.sha }}`

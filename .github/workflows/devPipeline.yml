@@ -12,14 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: github context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: commits
-        env:
-          COMMITS: ${{ toJson(github.event.commits) }}
-        run: echo "$COMMITS"
         # HASSKIP: ${{ contains(join(env.COMMIT_MESSAGES, ', '), env.SKIP) }}
       - name: commit messages
         id: commit_messages
@@ -35,12 +27,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: test output 1
-        run: echo ${{ needs.env_variables.outputs.commit_message }}
-
-  skip_test:
-    if: ${{ needs.env_variables.outputs.skip_present }}
-    needs: [env_variables]
-    runs-on: ubuntu-latest
-    steps:
-      - name: skip present
-        run: echo skip present
+        run: |
+          echo ${{ needs.env_variables.outputs.commit_message }}

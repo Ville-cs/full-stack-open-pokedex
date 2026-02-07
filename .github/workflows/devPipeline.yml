@@ -1,4 +1,4 @@
-name: Deployment pipeline
+name: Dev workflow test
 
 env:
   SKIP: '#skip'
@@ -29,7 +29,7 @@ jobs:
       commit_message: COMMIT_MESSAGES
       joined_message: JOINED_MESSAGE
 
-  dev_deployment_pipeline:
+  dev_workflow:
     needs: [env_variables]
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +37,9 @@ jobs:
       - name: test output 1
         run: echo ${{ contains(needs.env_variables.outputs.joined_message, env.SKIP) }}
       - name: test output 2
-        run: echo ${{ needs.env_variables.outputs.joined_message }}
+        env:
+          message: ${{ needs.env_variables.outputs.joined_message }}
+        run: echo ${{ contains(env.message, env.SKIP) }}
 
   skip_test:
     if: ${{ contains(join(needs.env_variables.outputs.commit_message), '#skip') }}

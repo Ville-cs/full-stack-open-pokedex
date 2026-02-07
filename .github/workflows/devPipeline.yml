@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: test output
+      - name: test output 1
         run: echo ${{ contains(needs.env_variables.outputs.joined_message, env.SKIP) }}
       - name: test output 2
         run: echo ${{ needs.env_variables.outputs.joined_message }}

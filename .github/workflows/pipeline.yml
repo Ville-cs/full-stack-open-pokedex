@@ -70,12 +70,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: success notification
+        uses: sarisia/actions-status-discord@v1
+        if: success()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          status: Success
+          title: Deployment successful
+          description: Deployment successful for `${{ github.repository }}`. `(${{ github.sha }})`
+      - name: success notification
         if: needs.simple_deployment_pipeline.result == 'success'
         uses: rjstone/discord-webhook-notify@v2.2.1
         with:
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          text: this is above the embed
-          title: title of the post
+          title: Update
           username: Cool user
           severity: info
           details: All tests passed and a new version has been deployed to production!

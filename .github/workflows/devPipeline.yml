@@ -19,7 +19,11 @@ jobs:
       - name: commit messages
         id: commit_messages
         run: |
-          echo "commit_message=${{ toJson(github.event.commits.*.message) }}" >> "$GITHUB_OUTPUT"
+          {
+            echo 'commit_message<<EOF'
+            echo '${{ toJson(github.event.commits.*.message) }}'
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
   dev_workflow:
     needs: [env_variables]

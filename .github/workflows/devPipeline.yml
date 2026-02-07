@@ -12,18 +12,18 @@ jobs:
   env_variables:
     runs-on: ubuntu-latest
     outputs:
-      commit_message: ${{ steps.commit_messages.outputs.commit_message }}
+      skip_present: ${{ steps.detect_skip.outputs.skip_present }}
     steps:
-      - uses: actions/checkout@v4
-
-      - name: commit messages
-        id: commit_messages
+      - name: detect skip token
+        id: detect_skip
         run: |
-          {
-            echo 'commit_message<<EOF'
-            echo '${{ toJson(github.event.commits.*.message) }}'
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+          messages='${{ toJson(github.event.commits.*.message) }}'
+
+          if echo "$messages" | grep -qi '#skip'; then
+            echo "skip_present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip_present=false" >> "$GITHUB_OUTPUT"
+          fi
 
   dev_workflow:
     needs: [env_variables]

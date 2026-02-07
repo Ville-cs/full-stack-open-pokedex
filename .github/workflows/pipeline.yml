@@ -71,26 +71,17 @@ jobs:
     steps:
       - name: success notification
         uses: sarisia/actions-status-discord@v1
-        if: success()
+        if: success() && needs.simple_deployment_pipeline.result == 'success'
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
           status: Success
           title: Deployment successful
-          description: Deployment successful for `${{ github.repository }}`. `(${{ github.sha }})`
-      - name: success notification
-        if: needs.simple_deployment_pipeline.result == 'success'
-        uses: rjstone/discord-webhook-notify@v2.2.1
-        with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          title: Update
-          username: Cool user
-          severity: info
-          details: All tests passed and a new version has been deployed to production!
+          description: Deployment successful for `${{ github.repository }}`. `SHA(${{ github.sha }})`
       - name: failure notification
-        if: needs.simple_deployment_pipeline.result == 'failure'
-        uses: rjstone/discord-webhook-notify@v2.2.1
+        uses: sarisia/actions-status-discord@v1
+        if: failure() && needs.simple_deployment_pipeline.result == 'failure'
         with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
-          username: Cool user
-          severity: error
-          details: There has been an error in the build!
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: Failure
+          title: Deployment failed
+          description: Deployment failed for `${{ github.repository }}`. `(${{ github.sha }})`

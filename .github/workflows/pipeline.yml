@@ -17,6 +17,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: test outputs
+        env:
+          str: ${{ needs.env_variables.outputs.commit_message }}
+        run: echo $'str'
+      - name: test outputs 2
+        env:
+          str: ${{ needs.env_variables.outputs.commit_message }}
+          str2: ${{ join('str') }}
+        run: echo $'str2'
+      - name: test outputs 3
+        env:
+          str: ${{ needs.env_variables.outputs.commit_message }}
+          str2: ${{ join('str') }}
+          str3: ${{ contains('str2', '#skip') }}
+        run: echo $"str3"
       - name: Install dependencies
         run: npm install
       - run: npm run eslint

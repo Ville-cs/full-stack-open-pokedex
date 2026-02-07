@@ -73,7 +73,7 @@ jobs:
         uses: sarisia/actions-status-discord@v1
         if: success()
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
           status: Success
           title: Deployment successful
           description: Deployment successful for `${{ github.repository }}`. `(${{ github.sha }})`

@@ -47,5 +47,5 @@ jobs:
     needs: [env_variables]
     runs-on: ubuntu-latest
     steps:
-      - name: skip test
+      - name: skip present
         run: echo skip present

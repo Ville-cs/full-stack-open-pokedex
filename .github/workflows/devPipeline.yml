@@ -26,13 +26,10 @@ jobs:
 
   dev_deployment_pipeline:
     needs: [env_variables]
-    if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: test outputs
         env:
-          str: ${{ needs.env_variables.outputs.commit_message }}
-          str2: ${{ join(env.str) }}
-          str3: ${{ contains(env.str2, '#skip') }}
-        run: echo ${{ needs.env_variables.outputs.commit_message }}
+          SKIP: #skip
+        run: echo ${{ contains(join(needs.env_variables.outputs.commit_message), env.SKIP) }}

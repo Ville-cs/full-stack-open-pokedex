@@ -1,8 +1,7 @@
 name: Health Check
 on:
-  push:
-    branches:
-      - dev
+  schedule:
+    - cron: '6 17 * * *'
 jobs:
   check_health:
     runs-on: ubuntu-latest
